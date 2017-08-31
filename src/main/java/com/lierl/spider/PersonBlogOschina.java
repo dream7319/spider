@@ -1,8 +1,8 @@
 package com.lierl.spider;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.lierl.spider.bean.Blog;
-import org.assertj.core.util.Lists;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
@@ -13,42 +13,53 @@ import java.util.List;
 
 /**
  * @author lierl
- * @create 2017-08-29 16:48
+ * @create 2017-08-31 13:35
  **/
-public class OsChinaSpider implements PageProcessor{
+public class PersonBlogOschina implements PageProcessor{
 
 	private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000)
 			.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36");
 
-	public static final String URL_LIST = "https://www.oschina.net/blog/action/ajax/get_more_recommend_blog\\?classification=0&p=\\d{1,3}";
+//	public static final String URL_LIST = "https://my.oschina.net/yumg/blog\\?sort=time&p=\\d{1,4}";
+	public int pageNum;
 
-	public static int pageNum = 1;
+	public String blogPageUrl;
 
-	static List<Blog> datas = Lists.newArrayList();
+	public PersonBlogOschina(){}
 
+	private String homeUrl;
+
+	private int totalPageNum;
+
+	static List<Blog> blogsList = Lists.newArrayList();
+
+	public PersonBlogOschina(String homeUrl){
+		this.homeUrl = homeUrl;
+		this.blogPageUrl = homeUrl+"\\?sort=time&p=\\d{1,4}";
+		this.pageNum = 1;
+		this.totalPageNum = 0;
+	}
 
 	@Override
 	public void process(Page page) {
-		if (page.getUrl().regex("^https://www\\.oschina\\.net/blog$").match()) {
-			try {
-				List<String> urls = page.getHtml().xpath("//*[@id=\"topsOfRecommend\"]//div[@class='box']/div[@class='box-aw']/header/a/@href").all();
-				page.addTargetRequests(urls);
-				pageNum++;
-				page.addTargetRequest("https://www.oschina.net/blog/action/ajax/get_more_recommend_blog?classification=0&p=2");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else if(page.getUrl().regex(URL_LIST).match() && pageNum <= 417){
-			try {
-				List<String> urls = page.getHtml().xpath("//*div[@class='box']/div[@class='box-aw']/header/a/@href").all();
-				page.addTargetRequests(urls);
-				page.addTargetRequest("https://www.oschina.net/blog/action/ajax/get_more_recommend_blog?classification=0&p=" + ++pageNum);
-				System.out.println("CurrPage:" + pageNum + "#######################################");
-			}catch (Exception e) {
-				e.printStackTrace();
-			}
-		}else {
+		if(page.getUrl().regex("^"+homeUrl+"$").match()){
+			List<String> uris = page.getHtml().xpath("//*div[@id='list']").css("div.title").xpath("//a/@href").all();
 
+			List<String> pages = page.getHtml().xpath("//*div[@id='list']").css("ul.paging").xpath("//li/a/text()").all();
+
+			int size = pages.size() - 1;
+			String num = page.getHtml().xpath("//*div[@id='list']").css("ul.paging").xpath("//li["+size+"]/a/text()").toString();
+
+			totalPageNum = Integer.valueOf(num);
+
+			page.addTargetRequests(uris);
+			pageNum++;
+			page.addTargetRequest(homeUrl+"?sort=time&p=2");
+		}else if(page.getUrl().regex(blogPageUrl).match() && pageNum <= totalPageNum){
+			List<String> uris = page.getHtml().xpath("//*div[@id='list']").css("div.title").xpath("//a/@href").all();
+			page.addTargetRequests(uris);
+			page.addTargetRequest(homeUrl+"?sort=time&p=" + ++pageNum);
+		}else{
 			Blog blog = new Blog();
 			// 获取页面需要的内容,这里只取了标题，其他信息同理。
 			Selectable article = page.getHtml().xpath("//div[@class='blog blog-article']");
@@ -82,10 +93,9 @@ public class OsChinaSpider implements PageProcessor{
 			//			System.out.println("博客内容："+article.xpath("//div[@id='blogBody']/div[@class='BlogContent clearfix']/tidyText()").get());
 			String url = article.css("div.back-list").xpath("//a[2]/@href").get();
 			blog.setUrl(url);
-			datas.add(blog);
+			blogsList.add(blog);
 			System.out.println(blog.toString());
 		}
-
 	}
 
 	@Override
@@ -94,8 +104,7 @@ public class OsChinaSpider implements PageProcessor{
 	}
 
 	public static void main(String[] args) {
-		Spider.create(new OsChinaSpider()).addUrl("https://www.oschina.net/blog").thread(5).run();
-
-		System.out.println("搜集总数："+datas.size());
+		Spider.create(new PersonBlogOschina("https://my.oschina.net/OutOfMemory")).addUrl("https://my.oschina.net/OutOfMemory").thread(5).run();
+		System.out.println("总数："+blogsList.size());
 	}
 }

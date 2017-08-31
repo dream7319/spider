@@ -30,6 +30,10 @@
       <artifactId>webmagic-extension</artifactId>
       <version>0.7.3</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>22.0</version>
+    </dependency>
   </dependencies>
 </project>

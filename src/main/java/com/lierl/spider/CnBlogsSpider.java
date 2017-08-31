@@ -12,7 +12,7 @@ import java.util.List;
  * @author lierl
  * @create 2017-08-29 14:14
  **/
-public class CsdnSpider implements PageProcessor {
+public class CnBlogsSpider implements PageProcessor {
 
 	private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000)
 			.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36");
@@ -32,7 +32,6 @@ public class CsdnSpider implements PageProcessor {
 				page.addTargetRequests(urls);
 				pageNum++;
 				page.addTargetRequest("https://www.cnblogs.com/sitehome/p/2");
-				System.out.println("1111="+pageNum);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -58,7 +57,7 @@ public class CsdnSpider implements PageProcessor {
 	}
 
 	public static void main(String[] args) {
-		Spider.create(new CsdnSpider()).addUrl("https://www.cnblogs.com").thread(3).run();
+		Spider.create(new CnBlogsSpider()).addUrl("https://www.cnblogs.com").thread(3).run();
 
 		for (int i = 0; i < uris.size(); i++) {
 			System.out.println(uris.get(i));
