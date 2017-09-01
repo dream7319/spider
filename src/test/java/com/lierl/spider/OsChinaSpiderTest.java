@@ -51,7 +51,7 @@ public class OsChinaSpiderTest implements PageProcessor{
 			String homeUrl = page.getUrl().toString();
 			homes.add(homeUrl);
 			PersonBlogOschina os = new PersonBlogOschina(homeUrl);
-			Spider.create(os).addUrl(homeUrl).thread(2).run();
+			Spider.create(os).addUrl(homeUrl).thread(5).run();
 		}
 
 	}
@@ -63,8 +63,8 @@ public class OsChinaSpiderTest implements PageProcessor{
 
 	public static void main(String[] args) {
 		Spider.create(new OsChinaSpiderTest()).addUrl("https://www.oschina.net/blog").thread(5).run();
-		for (int i = 0; i < homes.size(); i++) {
-			System.out.println(homes.get(i));
-		}
+//		for (int i = 0; i < homes.size(); i++) {
+//			System.out.println(homes.get(i));
+//		}
 	}
 }

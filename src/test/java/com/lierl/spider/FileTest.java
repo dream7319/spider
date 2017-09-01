@@ -1,8 +1,10 @@
 package com.lierl.spider;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -11,12 +13,10 @@ import java.util.List;
  **/
 public class FileTest {
 	public static void main(String[] args) throws IOException {
-		List<String> lines = Files.readAllLines(Paths.get("E:\\data.txt"));
-		lines.forEach(line->{
-			if(!line.startsWith("get page:")){
-				System.out.println(line);
-			}
-
-		});
+		List<String> datas = Lists.newArrayList();
+		datas.add("1");
+		datas.add("2");
+		datas.add("1");
+		System.out.println(Joiner.on(",").join(new HashSet<String>(datas)));
 	}
 }
