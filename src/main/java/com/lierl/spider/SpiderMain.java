@@ -1,14 +1,6 @@
 package com.lierl.spider;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author lierl
@@ -16,28 +8,11 @@ import java.util.concurrent.TimeUnit;
  **/
 public class SpiderMain {
 
-	public static OkHttpClient client;
-
-	private static OkHttpClient getClient() {
-		if(client == null){
-			final okhttp3.OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
-			client = httpBuilder
-					.connectTimeout(30, TimeUnit.SECONDS)
-					.writeTimeout(30, TimeUnit.SECONDS)
-					.build(); //设置超时
-		}
-
-		return client;
-	}
-
 	public static void main(String[] args) throws IOException {
-
-		Request request = new Request.Builder().url("https://www.cnblogs.com/sitehome/p/1").build();
-		OkHttpClient client = getClient();
-		Response response = client.newCall(request).execute();
-		if (response.isSuccessful()) {
-			System.out.println(response.body().string());
-		}
+		String s = " 97条  共7页";
+		int index = s.indexOf("共");
+		System.out.println(s.substring(index+1).replace("页",""));
+		System.out.println(s.substring(0,s.indexOf("条")).trim());
 	}
 
 }
